@@ -35,13 +35,14 @@ const createRoom=async(req,res)=>{
         let id=rooms.length?rooms[rooms.length-1].room_id +1 :1
          req.body.room_id = id
          rooms.push(req.body)
-            await res.status(200).send({
+            await res.status(200).json({
                 message:"Room Created Succesfully",
+                Room:rooms
                })
 
         
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             comment:'Internel server error'
         })
         
@@ -51,14 +52,14 @@ const createRoom=async(req,res)=>{
 //GET ALL ROOM
 const getAllRoom=async(req,res)=>{
     try {
-        await res.status(200).send({
+        await res.status(200).json({
             comment:"Fetch All Room Succesfully 👍",
             rooms
         })
 
         
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             comment:'Internel server error'
         })
         
@@ -73,7 +74,7 @@ const bookRoom=async(req,res)=>{
         let date = format(new Date(), "dd-MM-yyyy");
         let room=rooms.filter((e)=>e.room_status === "available" && e.room_id == roomID)
         if(!room){
-            res.status(400).send({
+            res.status(400).json({
                 message:'Room is not Available'
             })
             return;
@@ -90,14 +91,15 @@ const bookRoom=async(req,res)=>{
                 status:"booked" 
              }
        bookingRoom.push(booking) 
-       res.status(200).send({
+       res.status(200).json({
          message:"Succesfully Booked Room",
-         BookingRoom:booking
+         BookingRoom:booking,
+         bookingRoom
        })
           }     
 
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             message:"Internal server Error"
         })
         
@@ -119,13 +121,13 @@ const bookedRoom=async(req,res)=>{
                 endTime: booking? booking.end_time: null
             }
         })
-        res.status(200).send({
+        res.status(200).json({
             message:"Succesfully Fetched All Room with Booked Details",
             roomList
         })
         
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             comment:'Internel server error'
         })
     }
@@ -144,13 +146,13 @@ const  getAllCustomerData=async(req,res)=>{
                 end_time:booking.end_time
             }
         })
-        await res.status(200).send({
+        await res.status(200).json({
             message:"Succesfully Fetched All Customer with Booked Details",
             customerList
 
         })
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             comment:'Internel server error'
         })
     }
@@ -158,16 +160,23 @@ const  getAllCustomerData=async(req,res)=>{
 
 const bookCount=async(req,res)=>{
     try {
-        const { customer_name } = req.params;
-        const customerBooking = bookingRoom.filter((e) => e.customer_name === customer_name);
-        res.status(200).send({
+        const { customer_name } = req.body;
+        console.log('Requested Customer Name:', customer_name); // Log the requested customer name
+        const customerBooking = bookingRoom.filter((e) =>{ 
+        console.log('Booking Customer Name:', e.customer_name); // Log each booking's customer name
+            return e.customer_name === customer_name;    
+        });
+        console.log('Customer Booking:', customerBooking); // Log the resulting customer bookings
+
+        res.status(200).json({
             message: 'Successfully fetched',
             customer_name,
-            booking_count: customerBooking.length,
-            bookings: customerBooking
+            booking_count: bookingRoom.length,
+            bookings: bookingRoom
         });
     } catch (error) {
-        res.status(500).send({
+        console.error('Error in bookCount:', error); // Log any errors that occur
+        res.status(500).json({
             comment: 'Internal server error'
         });
     }
