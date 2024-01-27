@@ -1,4 +1,4 @@
-This is a Hall Booking API, a simple web application for managing room bookings in a Hall.
+<h1>This is a Hall Booking API</h1>
 
 <b>Features IN API:</b>
 Create rooms with details like room name, seats, amenities, and price per hour.
